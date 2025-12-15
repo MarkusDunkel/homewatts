@@ -208,11 +208,12 @@ services:
       SPRING_PROFILES_ACTIVE: collector
       JAVA_TOOL_OPTIONS: "-Dspring.profiles.active=collector"
 
-      # Collector ONLY talks to the cache DB
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/homewatts_cache
+      # App DB (prod)
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/homewatts_prod
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
 
+      # Shared cache DB
       CACHE_DATASOURCE_URL: jdbc:postgresql://db:5432/homewatts_cache
       CACHE_DATASOURCE_USERNAME: ${DB_USERNAME}
       CACHE_DATASOURCE_PASSWORD: ${DB_PASSWORD}
