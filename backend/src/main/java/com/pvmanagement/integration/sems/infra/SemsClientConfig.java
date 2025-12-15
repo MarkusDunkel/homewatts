@@ -20,7 +20,7 @@ public class SemsClientConfig {
     private static final String RETRIED_HDR = "X-Sems-Retried";
 
     @Bean("semsWebClient")
-    WebClient semsWebClient(WebClient.Builder builder,
+    public WebClient semsWebClient(WebClient.Builder builder,
             @Value("${sems.base-url}") String baseUrl,
             SemsAuthService auth,
             ObjectMapper objectMapper) {
