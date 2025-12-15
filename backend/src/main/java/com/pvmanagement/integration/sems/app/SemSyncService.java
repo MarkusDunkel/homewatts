@@ -13,10 +13,12 @@ import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 @Service
+@Profile("collector")
 public class SemSyncService {
 
     private static final Logger log = LoggerFactory.getLogger(SemSyncService.class);

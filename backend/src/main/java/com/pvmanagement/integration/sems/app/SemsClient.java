@@ -3,6 +3,7 @@ package com.pvmanagement.integration.sems.app;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.pvmanagement.integration.sems.domain.SemsProperties;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -10,6 +11,7 @@ import java.time.Duration;
 import java.util.Map;
 
 @Component
+@Profile("collector")
 public class SemsClient {
     private final WebClient webClient;
     private final SemsProperties properties;

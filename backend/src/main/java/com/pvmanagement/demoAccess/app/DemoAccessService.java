@@ -18,6 +18,7 @@ import com.pvmanagement.auth.app.AuthService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
+import org.springframework.context.annotation.Profile;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,7 @@ import java.util.UUID;
 
 @Service
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
+@Profile("!collector")
 public class DemoAccessService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DemoAccessService.class);

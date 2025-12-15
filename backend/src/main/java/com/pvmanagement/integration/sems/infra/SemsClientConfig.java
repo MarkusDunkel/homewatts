@@ -5,6 +5,7 @@ import com.pvmanagement.integration.sems.app.SemsAuthService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.reactive.function.client.ClientRequest;
 import org.springframework.web.reactive.function.client.ClientResponse;
@@ -13,6 +14,7 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 @Configuration
+@Profile("collector")
 public class SemsClientConfig {
 
     private static final String RETRIED_HDR = "X-Sems-Retried";

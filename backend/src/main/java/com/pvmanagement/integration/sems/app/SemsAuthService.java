@@ -3,6 +3,7 @@ package com.pvmanagement.integration.sems.app;
 import com.pvmanagement.integration.sems.domain.SemsProperties;
 import com.pvmanagement.integration.sems.domain.LoginResponse;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,6 +11,7 @@ import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
 @Service
+@Profile("collector")
 public class SemsAuthService {
 
     private final WebClient.Builder builder;
