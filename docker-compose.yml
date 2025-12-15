@@ -37,7 +37,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - traefik_letsencrypt:/letsencrypt
     networks:
-      - appnet
+      - homewatts-net
     labels:
       - "traefik.enable=true"
 
@@ -62,7 +62,7 @@ services:
     ports:
       - "5432:5432"
     networks:
-      - appnet
+      - homewatts-net
 
   # === PROD BACKEND ===
   backend_prod:
@@ -99,7 +99,7 @@ services:
     expose:
       - "8080"
     networks:
-      - appnet
+      - homewatts-net
     # internal only (no traefik labels; frontend talks to it)
 
   # === STAGING BACKEND ===
@@ -137,7 +137,7 @@ services:
     expose:
       - "8080"
     networks:
-      - appnet
+      - homewatts-net
 
   # === PROD FRONTEND ===
   frontend_prod:
@@ -150,7 +150,7 @@ services:
     depends_on:
       - backend_prod
     networks:
-      - appnet
+      - homewatts-net
     labels:
       - "traefik.enable=true"
 
@@ -183,7 +183,7 @@ services:
     depends_on:
       - backend_staging
     networks:
-      - appnet
+      - homewatts-net
     labels:
       - "traefik.enable=true"
 
@@ -231,12 +231,12 @@ services:
       retries: 6
       start_period: 15s
     networks:
-      - appnet
+      - homewatts-net
     # no traefik labels => not exposed publicly
 
 
 networks:
-  appnet:
+  homewatts-net:
     driver: bridge
 
 volumes:
