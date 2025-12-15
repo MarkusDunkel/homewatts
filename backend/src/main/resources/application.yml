@@ -49,7 +49,7 @@ app:
     key-valid-days: ${DEMO_KEY_VALID_DAYS:180}
   ingestion:
     enabled: true
-    interval: PT5M
+    interval: PT1M
     cursor-id: cache_ingestion_global
 
 sems:

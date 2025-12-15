@@ -13,10 +13,7 @@ import com.pvmanagement.monitoring.infra.PowerflowSnapshotRepository;
 import com.pvmanagement.monitoring.infra.SemSyncLogRepository;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -99,7 +96,13 @@ public class CacheIngestionService {
         JsonNode root = objectMapper.readTree(entry.responseJson());
         JsonNode data = root.path("data");
         PowerStation station = persistPowerStation(data.path("info"));
-        persistPowerflowSnapshot(station, data.path("powerflow"), entry.fetchedAt());
+
+        OffsetDateTime tspMeasurement =
+                LocalDateTime.parse(data.path("info").path("time").asText(null),
+                        DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss")).atZone(ZoneId.of("Europe/Vienna"))
+                        .toOffsetDateTime();
+
+        persistPowerflowSnapshot(station, data.path("powerflow"), tspMeasurement);
         recordSync(station, "SUCCESS", null);
     }
 
@@ -132,17 +135,17 @@ public class CacheIngestionService {
         return powerStationRepository.save(station);
     }
 
-    private void persistPowerflowSnapshot(PowerStation station, JsonNode powerflowNode, Instant fetchedAt) {
+    private void persistPowerflowSnapshot(PowerStation station, JsonNode powerflowNode, OffsetDateTime tspMeasurement) {
         if (powerflowNode.isMissingNode()) {
             return;
         }
-        OffsetDateTime snapshotTs = OffsetDateTime.ofInstant(fetchedAt, ZoneOffset.UTC);
-        if (powerflowSnapshotRepository.existsByPowerStationAndPowerflowTimestamp(station, snapshotTs)) {
+
+        if (powerflowSnapshotRepository.existsByPowerStationAndPowerflowTimestamp(station, tspMeasurement)) {
             return;
         }
         var snapshot = new PowerflowSnapshot();
         snapshot.setPowerStation(station);
-        snapshot.setPowerflowTimestamp(snapshotTs);
+        snapshot.setPowerflowTimestamp(tspMeasurement);
         snapshot.setPvW(asBigDecimal(powerflowNode.path("pv")));
         snapshot.setBatteryW(asBigDecimal(powerflowNode.path("bettery")));
         snapshot.setLoadW(asBigDecimal(powerflowNode.path("load")));
