@@ -6,7 +6,7 @@ spring:
     banner-mode: off
 
   datasource:
-    url: jdbc:postgresql://127.0.0.1:5432/${DB_NAME_LOCAL}
+    url: jdbc:postgresql://127.0.0.1:5432/${DB_NAME_PROD}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
 
