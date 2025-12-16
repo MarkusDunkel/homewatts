@@ -54,7 +54,7 @@ services:
       - ./mnt/db/postgres_v1:/var/lib/postgresql/data
       - ./infrastructure/postgres:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB -h 127.0.0.1" ]
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -p 5432 -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 5s
       timeout: 3s
       retries: 20
@@ -62,7 +62,9 @@ services:
     ports:
       - "5432:5432"
     networks:
-      - homewatts-net
+        homewatts-net:
+          aliases:
+            - homewatts-db
 
   # === PROD BACKEND ===
   backend_prod:
@@ -74,18 +76,17 @@ services:
         condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: prod
-      JAVA_TOOL_OPTIONS: "-Dspring.profiles.active=prod"
 
       SERVER_ADDRESS: "0.0.0.0"
       SERVER_PORT: "8080"
 
       # App DB (prod)
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/homewatts_prod
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/homewatts_prod?tcpKeepAlive=true
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
 
       # Shared cache DB
-      CACHE_DATASOURCE_URL: jdbc:postgresql://db:5432/homewatts_cache
+      CACHE_DATASOURCE_URL: jdbc:postgresql://db:5432/homewatts_cache?tcpKeepAlive=true
       CACHE_DATASOURCE_USERNAME: ${DB_USERNAME}
       CACHE_DATASOURCE_PASSWORD: ${DB_PASSWORD}
 
@@ -112,18 +113,17 @@ services:
         condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: staging
-      JAVA_TOOL_OPTIONS: "-Dspring.profiles.active=staging"
 
       SERVER_ADDRESS: "0.0.0.0"
       SERVER_PORT: "8080"
 
       # App DB (staging)
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/homewatts_staging
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/homewatts_staging?tcpKeepAlive=true
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
 
       # Shared cache DB
-      CACHE_DATASOURCE_URL: jdbc:postgresql://db:5432/homewatts_cache
+      CACHE_DATASOURCE_URL: jdbc:postgresql://db:5432/homewatts_cache?tcpKeepAlive=true
       CACHE_DATASOURCE_USERNAME: ${DB_USERNAME}
       CACHE_DATASOURCE_PASSWORD: ${DB_PASSWORD}
 
@@ -206,15 +206,14 @@ services:
       db: { condition: service_healthy }
     environment:
       SPRING_PROFILES_ACTIVE: collector
-      JAVA_TOOL_OPTIONS: "-Dspring.profiles.active=collector"
 
       # App DB (prod)
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/homewatts_prod
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/homewatts_prod?tcpKeepAlive=true
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
 
       # Shared cache DB
-      CACHE_DATASOURCE_URL: jdbc:postgresql://db:5432/homewatts_cache
+      CACHE_DATASOURCE_URL: jdbc:postgresql://db:5432/homewatts_cache?tcpKeepAlive=true
       CACHE_DATASOURCE_USERNAME: ${DB_USERNAME}
       CACHE_DATASOURCE_PASSWORD: ${DB_PASSWORD}
 
