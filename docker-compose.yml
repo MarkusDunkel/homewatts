@@ -152,7 +152,7 @@ services:
     networks:
       - homewatts-net
     labels:
-      - "traefik.enable=true"
+      - "traefik.enable=false"
 
       # Prod host
       - "traefik.http.routers.front-prod.rule=Host(`${APP_HOST}`)"
@@ -185,7 +185,7 @@ services:
     networks:
       - homewatts-net
     labels:
-      - "traefik.enable=true"
+      - "traefik.enable=false"
 
       # Staging host (e.g. staging.yourdomain.tld)
       - "traefik.http.routers.front-staging.rule=Host(`${APP_HOST_STAGING}`)"
