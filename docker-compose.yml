@@ -51,7 +51,7 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: postgres   # default DB; our init script creates the others
     volumes:
-      - ./mnt/db/postgres_v1:/var/lib/postgresql/data
+      - /mnt/db/postgres_v1:/var/lib/postgresql/data
       - ./infrastructure/postgres:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -p 5432 -U $$POSTGRES_USER -d $$POSTGRES_DB"]
