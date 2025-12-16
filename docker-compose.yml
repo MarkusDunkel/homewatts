@@ -81,12 +81,12 @@ services:
       SERVER_PORT: "8080"
 
       # App DB (prod)
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/homewatts_prod?tcpKeepAlive=true
+      SPRING_DATASOURCE_URL: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME_PROD}?tcpKeepAlive=true
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
 
       # Shared cache DB
-      CACHE_DATASOURCE_URL: jdbc:postgresql://db:5432/homewatts_cache?tcpKeepAlive=true
+      CACHE_DATASOURCE_URL: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME_CACHE}?tcpKeepAlive=true
       CACHE_DATASOURCE_USERNAME: ${DB_USERNAME}
       CACHE_DATASOURCE_PASSWORD: ${DB_PASSWORD}
 
@@ -118,12 +118,12 @@ services:
       SERVER_PORT: "8080"
 
       # App DB (staging)
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/homewatts_staging?tcpKeepAlive=true
+      SPRING_DATASOURCE_URL: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME_STAGING}?tcpKeepAlive=true
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
 
       # Shared cache DB
-      CACHE_DATASOURCE_URL: jdbc:postgresql://db:5432/homewatts_cache?tcpKeepAlive=true
+      CACHE_DATASOURCE_URL: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME_CACHE}?tcpKeepAlive=true
       CACHE_DATASOURCE_USERNAME: ${DB_USERNAME}
       CACHE_DATASOURCE_PASSWORD: ${DB_PASSWORD}
 
@@ -208,12 +208,12 @@ services:
       SPRING_PROFILES_ACTIVE: collector
 
       # App DB (prod)
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/homewatts_prod?tcpKeepAlive=true
+      SPRING_DATASOURCE_URL: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME_PROD}?tcpKeepAlive=true
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
 
       # Shared cache DB
-      CACHE_DATASOURCE_URL: jdbc:postgresql://db:5432/homewatts_cache?tcpKeepAlive=true
+      CACHE_DATASOURCE_URL: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME_CACHE}?tcpKeepAlive=true
       CACHE_DATASOURCE_USERNAME: ${DB_USERNAME}
       CACHE_DATASOURCE_PASSWORD: ${DB_PASSWORD}
 

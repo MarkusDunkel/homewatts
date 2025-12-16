@@ -29,9 +29,6 @@ logging:
     com.pvmanagement: DEBUG
     org.springframework.security: DEBUG
     com.pvmanagement.security: DEBUG
-    com.zaxxer.hikari: DEBUG
-    org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator: DEBUG
-    org.springframework.jdbc.datasource: DEBUG
 
 cache:
   datasource:
