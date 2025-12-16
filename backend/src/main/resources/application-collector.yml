@@ -6,7 +6,7 @@ spring:
     banner-mode: off
 
   datasource:
-    url: jdbc:postgresql://127.0.0.1:5432/${DB_NAME_PROD}
+    url: jdbc:postgresql://${DB_HOST:localhost}:5432/${DB_NAME_PROD}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
 
@@ -27,7 +27,7 @@ spring:
 
 cache:
   datasource:
-    url: jdbc:postgresql://127.0.0.1:5432/homewatts_cache
+    url: jdbc:postgresql://${DB_HOST:localhost}:5432/homewatts_cache
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
 
@@ -42,15 +42,6 @@ management:
   endpoint:
     health:
       show-details: "never"   # avoid leaking DB details in health
-
-# keep logging modest in the worker
-logging:
-  level:
-    root: INFO
-    com.pvmanagement: INFO
-    org.springframework.security: WARN
-    org.hibernate.SQL: WARN
-    org.hibernate.type.descriptor.sql: WARN
 
 # optional feature flag if you guarded your collector code with @ConditionalOnProperty
 ingestion:

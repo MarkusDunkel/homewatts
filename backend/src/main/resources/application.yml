@@ -29,10 +29,13 @@ logging:
     com.pvmanagement: DEBUG
     org.springframework.security: DEBUG
     com.pvmanagement.security: DEBUG
+    com.zaxxer.hikari: DEBUG
+    org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator: DEBUG
+    org.springframework.jdbc.datasource: DEBUG
 
 cache:
   datasource:
-    url: jdbc:postgresql://localhost:5432/homewatts_cache
+    url: jdbc:postgresql://${DB_HOST:localhost}:5432/homewatts_cache
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
 
