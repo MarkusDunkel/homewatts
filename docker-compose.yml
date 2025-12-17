@@ -37,12 +37,12 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - traefik_letsencrypt:/letsencrypt
     networks:
-      - homewatts-net
+      - proxy
     labels:
       - "traefik.enable=true"
 
   # === Shared Postgres instance: prod + staging + cache ===
-  db:
+  db_v1:
     image: postgres:16
     container_name: homewatts-db
     restart: unless-stopped
@@ -59,12 +59,10 @@ services:
       timeout: 3s
       retries: 20
       start_period: 20s
-    ports:
-      - "5432:5432"
     networks:
-        homewatts-net:
-          aliases:
-            - homewatts-db
+      homewatts-net:
+        aliases:
+          - homewatts-db
 
   # === PROD BACKEND ===
   backend_prod:
@@ -72,7 +70,7 @@ services:
     container_name: homewatts-prod-be
     restart: unless-stopped
     depends_on:
-      db:
+      db_v1:
         condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: prod
@@ -109,7 +107,7 @@ services:
     container_name: homewatts-staging-be
     restart: unless-stopped
     depends_on:
-      db:
+      db_v1:
         condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: staging
@@ -151,11 +149,12 @@ services:
       - backend_prod
     networks:
       - homewatts-net
+      - proxy
     labels:
-      - "traefik.enable=false"
+      - "traefik.enable=true"
 
       # Prod host
-      - "traefik.http.routers.front-prod.rule=Host(`${APP_HOST}`)"
+      - "traefik.http.routers.front-prod.rule=Host(`${APP_HOST_V1}`)"
       - "traefik.http.routers.front-prod.entrypoints=websecure"
       - "traefik.http.routers.front-prod.tls=true"
       - "traefik.http.routers.front-prod.tls.certresolver=le"
@@ -184,8 +183,9 @@ services:
       - backend_staging
     networks:
       - homewatts-net
+      - proxy
     labels:
-      - "traefik.enable=false"
+      - "traefik.enable=true"
 
       # Staging host (e.g. staging.yourdomain.tld)
       - "traefik.http.routers.front-staging.rule=Host(`${APP_HOST_STAGING}`)"
@@ -203,7 +203,7 @@ services:
     container_name: homewatts-collector
     restart: unless-stopped
     depends_on:
-      db: { condition: service_healthy }
+      db_v1: { condition: service_healthy }
     environment:
       SPRING_PROFILES_ACTIVE: collector
 
@@ -235,6 +235,10 @@ services:
 
 
 networks:
+  proxy:
+    external: true
+    name: pv-management-app_appnet
+
   homewatts-net:
     driver: bridge
 
