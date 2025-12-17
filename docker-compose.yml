@@ -60,9 +60,10 @@ services:
       retries: 20
       start_period: 20s
     networks:
-      homewatts-net:
-        aliases:
-          - homewatts-db
+      homewatts-prod-net:
+        aliases: [homewatts-db]
+      homewatts-staging-net:
+        aliases: [homewatts-db]
 
   # === PROD BACKEND ===
   backend_prod:
@@ -98,7 +99,8 @@ services:
     expose:
       - "8080"
     networks:
-      - homewatts-net
+      homewatts-prod-net:
+        aliases: [backend] 
     # internal only (no traefik labels; frontend talks to it)
 
   # === STAGING BACKEND ===
@@ -135,7 +137,8 @@ services:
     expose:
       - "8080"
     networks:
-      - homewatts-net
+      homewatts-staging-net:
+        aliases: [backend] 
 
   # === PROD FRONTEND ===
   frontend_prod:
@@ -148,7 +151,7 @@ services:
     depends_on:
       - backend_prod
     networks:
-      - homewatts-net
+      - homewatts-prod-net
       - proxy
     labels:
       - "traefik.enable=true"
@@ -182,7 +185,7 @@ services:
     depends_on:
       - backend_staging
     networks:
-      - homewatts-net
+      - homewatts-staging-net
       - proxy
     labels:
       - "traefik.enable=true"
@@ -230,7 +233,7 @@ services:
       retries: 6
       start_period: 15s
     networks:
-      - homewatts-net
+      - homewatts-prod-net
     # no traefik labels => not exposed publicly
 
 
@@ -239,7 +242,10 @@ networks:
     external: true
     name: pv-management-app_appnet
 
-  homewatts-net:
+  homewatts-prod-net:
+    driver: bridge
+
+  homewatts-staging-net:
     driver: bridge
 
 volumes:
