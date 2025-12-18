@@ -1,55 +1,91 @@
 version: "3.9"
 
+x-restart: &restart unless-stopped
+
+x-db-env: &db_env
+  POSTGRES_USER: ${DB_USERNAME}
+  POSTGRES_PASSWORD: ${DB_PASSWORD}
+  POSTGRES_DB: postgres
+
+x-backend-common-env: &backend_common_env
+  SERVER_ADDRESS: "0.0.0.0"
+  SERVER_PORT: "8080"
+
+  # Shared cache DB
+  CACHE_DATASOURCE_URL: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME_CACHE}?tcpKeepAlive=true
+  CACHE_DATASOURCE_USERNAME: ${DB_USERNAME}
+  CACHE_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+
+  SEMS_ACCOUNT: ${SEMS_ACCOUNT}
+  SEMS_PASSWORD: ${SEMS_PASSWORD}
+  SEMS_STATION_ID: ${SEMS_STATION_ID}
+
+  JWT_SECRET: ${JWT_SECRET}
+  APP_ADMIN_EMAIL: ${APP_ADMIN_EMAIL:-admin@example.com}
+  APP_ADMIN_PASSWORD: ${APP_ADMIN_PASSWORD}
+  DEMO_SECRET: ${DEMO_SECRET}
+
+x-backend-common: &backend_common
+  restart: *restart
+  depends_on:
+    db:
+      condition: service_healthy
+  expose:
+    - "8080"
+  networks:
+    - homewatts-net
+
+x-frontend-common: &frontend_common
+  restart: *restart
+  networks:
+    - homewatts-net
+  labels:
+    traefik.enable: "true"
+
+x-sec-headers: &sec_headers_labels
+  traefik.http.middlewares.sec-headers.headers.stsSeconds: "31536000"
+  traefik.http.middlewares.sec-headers.headers.stsIncludeSubdomains: "true"
+  traefik.http.middlewares.sec-headers.headers.stsPreload: "true"
+  traefik.http.middlewares.sec-headers.headers.contentTypeNosniff: "true"
+  traefik.http.middlewares.sec-headers.headers.frameDeny: "true"
+  traefik.http.middlewares.sec-headers.headers.referrerPolicy: "no-referrer"
+
 services:
-  # === Reverse proxy / TLS terminator (unchanged, just extended for staging later) ===
   traefik:
     image: traefik:v3.1
     container_name: homewatts-traefik
-    restart: unless-stopped
+    restart: *restart
     command:
-      # Discover Docker services
       - --providers.docker=true
       - --providers.docker.exposedbydefault=false
 
-      # Entrypoints
       - --entrypoints.web.address=:80
       - --entrypoints.websecure.address=:443
-      # Redirect all HTTP -> HTTPS
       - --entrypoints.web.http.redirections.entryPoint.to=websecure
       - --entrypoints.web.http.redirections.entryPoint.scheme=https
 
-      # Let's Encrypt (HTTP-01)
       - --certificatesresolvers.le.acme.email=${ACME_EMAIL}
       - --certificatesresolvers.le.acme.storage=/letsencrypt/acme.json
       - --certificatesresolvers.le.acme.httpchallenge=true
       - --certificatesresolvers.le.acme.httpchallenge.entrypoint=web
 
-      # (Optional) use staging CA first to test and avoid rate limits:
-      # - --certificatesresolvers.le.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory
-
-      # (Optional) dashboard — keep disabled or protect heavily
       - --api.dashboard=false
     ports:
       - "80:80"
       - "443:443"
-      # - "8080:8080"   # dashboard (disabled above)
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - traefik_letsencrypt:/letsencrypt
     networks:
       - homewatts-net
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
 
-  # === Shared Postgres instance: prod + staging + cache ===
   db:
     image: postgres:16
     container_name: homewatts-db
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: ${DB_USERNAME}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: postgres   # default DB; our init script creates the others
+    restart: *restart
+    environment: *db_env
     volumes:
       - /mnt/db/postgres_v1:/var/lib/postgresql/data
       - ./infrastructure/postgres:/docker-entrypoint-initdb.d:ro
@@ -61,162 +97,86 @@ services:
       start_period: 20s
     networks:
       homewatts-net:
-        aliases: [homewatts-db]
+        aliases:
+          - homewatts-db
 
-  # === PROD BACKEND ===
   backend_prod:
+    <<: *backend_common
     image: ghcr.io/markusdunkel/homewatts-backend:${IMAGE_TAG_PROD}
     container_name: homewatts-prod-be
-    restart: unless-stopped
-    depends_on:
-      db:
-        condition: service_healthy
     environment:
+      <<: *backend_common_env
       SPRING_PROFILES_ACTIVE: prod
-
-      SERVER_ADDRESS: "0.0.0.0"
-      SERVER_PORT: "8080"
-
-      # App DB (prod)
       SPRING_DATASOURCE_URL: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME_PROD}?tcpKeepAlive=true
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
 
-      # Shared cache DB
-      CACHE_DATASOURCE_URL: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME_CACHE}?tcpKeepAlive=true
-      CACHE_DATASOURCE_USERNAME: ${DB_USERNAME}
-      CACHE_DATASOURCE_PASSWORD: ${DB_PASSWORD}
-
-      SEMS_ACCOUNT: ${SEMS_ACCOUNT}
-      SEMS_PASSWORD: ${SEMS_PASSWORD}
-      SEMS_STATION_ID: ${SEMS_STATION_ID}
-      JWT_SECRET: ${JWT_SECRET}
-      APP_ADMIN_EMAIL: ${APP_ADMIN_EMAIL:-admin@example.com}
-      APP_ADMIN_PASSWORD: ${APP_ADMIN_PASSWORD}
-      DEMO_SECRET: ${DEMO_SECRET}
-    expose:
-      - "8080"
-    networks:
-      homewatts-net:
-    # internal only (no traefik labels; frontend talks to it)
-
-  # === STAGING BACKEND ===
   backend_staging:
+    <<: *backend_common
     image: ghcr.io/markusdunkel/homewatts-backend:${IMAGE_TAG_STAGING}
     container_name: homewatts-staging-be
-    restart: unless-stopped
-    depends_on:
-      db:
-        condition: service_healthy
     environment:
+      <<: *backend_common_env
       SPRING_PROFILES_ACTIVE: staging
-
-      SERVER_ADDRESS: "0.0.0.0"
-      SERVER_PORT: "8080"
-
-      # App DB (staging)
       SPRING_DATASOURCE_URL: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME_STAGING}?tcpKeepAlive=true
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
 
-      # Shared cache DB
-      CACHE_DATASOURCE_URL: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME_CACHE}?tcpKeepAlive=true
-      CACHE_DATASOURCE_USERNAME: ${DB_USERNAME}
-      CACHE_DATASOURCE_PASSWORD: ${DB_PASSWORD}
-
-      SEMS_ACCOUNT: ${SEMS_ACCOUNT}
-      SEMS_PASSWORD: ${SEMS_PASSWORD}
-      SEMS_STATION_ID: ${SEMS_STATION_ID}
-      JWT_SECRET: ${JWT_SECRET}
-      APP_ADMIN_EMAIL: ${APP_ADMIN_EMAIL:-admin@example.com}
-      APP_ADMIN_PASSWORD: ${APP_ADMIN_PASSWORD}
-      DEMO_SECRET: ${DEMO_SECRET}
-    expose:
-      - "8080"
-    networks:
-      homewatts-net:
-
-  # === PROD FRONTEND ===
   frontend_prod:
+    <<: *frontend_common
     image: ghcr.io/markusdunkel/homewatts-frontend:${IMAGE_TAG_PROD}
     container_name: homewatts-prod-fe
+    depends_on:
+      - backend_prod
     environment:
       BACKEND_HOST: backend_prod
       BACKEND_PORT: 8080
-    restart: unless-stopped
-    depends_on:
-      - backend_prod
-    networks:
-      - homewatts-net
     labels:
-      - "traefik.enable=true"
+      <<: *sec_headers_labels
+      traefik.enable: "true"
+      traefik.http.routers.front-prod.rule: Host(`${APP_HOST}`)
+      traefik.http.routers.front-prod.entrypoints: websecure
+      traefik.http.routers.front-prod.tls: "true"
+      traefik.http.routers.front-prod.tls.certresolver: le
+      traefik.http.routers.front-prod.middlewares: sec-headers@docker
+      traefik.http.services.front-prod.loadbalancer.server.port: "80"
 
-      # Prod host
-      - "traefik.http.routers.front-prod.rule=Host(`${APP_HOST}`)"
-      - "traefik.http.routers.front-prod.entrypoints=websecure"
-      - "traefik.http.routers.front-prod.tls=true"
-      - "traefik.http.routers.front-prod.tls.certresolver=le"
-
-      # Security headers (same as before)
-      - "traefik.http.middlewares.sec-headers.headers.stsSeconds=31536000"
-      - "traefik.http.middlewares.sec-headers.headers.stsIncludeSubdomains=true"
-      - "traefik.http.middlewares.sec-headers.headers.stsPreload=true"
-      - "traefik.http.middlewares.sec-headers.headers.contentTypeNosniff=true"
-      - "traefik.http.middlewares.sec-headers.headers.frameDeny=true"
-      - "traefik.http.middlewares.sec-headers.headers.referrerPolicy=no-referrer"
-      - "traefik.http.routers.front-prod.middlewares=sec-headers@docker"
-
-      - "traefik.http.services.front-prod.loadbalancer.server.port=80"
-
-  # === STAGING FRONTEND ===
   frontend_staging:
+    <<: *frontend_common
     image: ghcr.io/markusdunkel/homewatts-frontend:${IMAGE_TAG_STAGING}
     container_name: homewatts-staging-fe
+    depends_on:
+      - backend_staging
     environment:
       BACKEND_HOST: backend_staging
       BACKEND_PORT: 8080
-    restart: unless-stopped
-    depends_on:
-      - backend_staging
-    networks:
-      - homewatts-net
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
+      traefik.http.routers.front-staging.rule: Host(`${APP_HOST_STAGING}`)
+      traefik.http.routers.front-staging.entrypoints: websecure
+      traefik.http.routers.front-staging.tls: "true"
+      traefik.http.routers.front-staging.tls.certresolver: le
+      traefik.http.routers.front-staging.middlewares: sec-headers@docker
+      traefik.http.services.front-staging.loadbalancer.server.port: "80"
 
-      # Staging host (e.g. staging.yourdomain.tld)
-      - "traefik.http.routers.front-staging.rule=Host(`${APP_HOST_STAGING}`)"
-      - "traefik.http.routers.front-staging.entrypoints=websecure"
-      - "traefik.http.routers.front-staging.tls=true"
-      - "traefik.http.routers.front-staging.tls.certresolver=le"
-      - "traefik.http.services.front-staging.loadbalancer.server.port=80"
-
-      - "traefik.http.routers.front-staging.middlewares=sec-headers@docker"
-
-  # === COLLECTOR ===
   collector:
+    <<: *backend_common
     image: ghcr.io/markusdunkel/homewatts-backend:${IMAGE_TAG_COLLECTOR:-${IMAGE_TAG_PROD}}
     container_name: homewatts-collector
-    restart: unless-stopped
-    depends_on:
-      db: { condition: service_healthy }
     environment:
       SPRING_PROFILES_ACTIVE: collector
 
-      # App DB (prod)
       SPRING_DATASOURCE_URL: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME_PROD}?tcpKeepAlive=true
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
 
-      # Shared cache DB
       CACHE_DATASOURCE_URL: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME_CACHE}?tcpKeepAlive=true
       CACHE_DATASOURCE_USERNAME: ${DB_USERNAME}
       CACHE_DATASOURCE_PASSWORD: ${DB_PASSWORD}
 
-      # External API credentials (collector will use these to fetch)
       SEMS_ACCOUNT: ${SEMS_ACCOUNT}
       SEMS_PASSWORD: ${SEMS_PASSWORD}
       SEMS_STATION_ID: ${SEMS_STATION_ID}
-
     stop_grace_period: "30s"
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8081/actuator/health || exit 1"]
@@ -224,10 +184,6 @@ services:
       timeout: 3s
       retries: 6
       start_period: 15s
-    networks:
-      - homewatts-net
-    # no traefik labels => not exposed publicly
-
 
 networks:
   homewatts-net:
