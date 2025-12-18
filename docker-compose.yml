@@ -37,12 +37,12 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - traefik_letsencrypt:/letsencrypt
     networks:
-      - proxy
+      - homewatts-net
     labels:
       - "traefik.enable=true"
 
   # === Shared Postgres instance: prod + staging + cache ===
-  db_v1:
+  db:
     image: postgres:16
     container_name: homewatts-db
     restart: unless-stopped
@@ -60,9 +60,7 @@ services:
       retries: 20
       start_period: 20s
     networks:
-      homewatts-prod-net:
-        aliases: [homewatts-db]
-      homewatts-staging-net:
+      homewatts-net:
         aliases: [homewatts-db]
 
   # === PROD BACKEND ===
@@ -71,7 +69,7 @@ services:
     container_name: homewatts-prod-be
     restart: unless-stopped
     depends_on:
-      db_v1:
+      db:
         condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: prod
@@ -99,8 +97,7 @@ services:
     expose:
       - "8080"
     networks:
-      homewatts-prod-net:
-        aliases: [backend] 
+      homewatts-net:
     # internal only (no traefik labels; frontend talks to it)
 
   # === STAGING BACKEND ===
@@ -109,7 +106,7 @@ services:
     container_name: homewatts-staging-be
     restart: unless-stopped
     depends_on:
-      db_v1:
+      db:
         condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: staging
@@ -137,8 +134,7 @@ services:
     expose:
       - "8080"
     networks:
-      homewatts-staging-net:
-        aliases: [backend] 
+      homewatts-net:
 
   # === PROD FRONTEND ===
   frontend_prod:
@@ -151,13 +147,12 @@ services:
     depends_on:
       - backend_prod
     networks:
-      - homewatts-prod-net
-      - proxy
+      - homewatts-net
     labels:
       - "traefik.enable=true"
 
       # Prod host
-      - "traefik.http.routers.front-prod.rule=Host(`${APP_HOST_V1}`)"
+      - "traefik.http.routers.front-prod.rule=Host(`${APP_HOST}`)"
       - "traefik.http.routers.front-prod.entrypoints=websecure"
       - "traefik.http.routers.front-prod.tls=true"
       - "traefik.http.routers.front-prod.tls.certresolver=le"
@@ -172,7 +167,6 @@ services:
       - "traefik.http.routers.front-prod.middlewares=sec-headers@docker"
 
       - "traefik.http.services.front-prod.loadbalancer.server.port=80"
-      - "traefik.docker.network=pv-management-app_appnet"
 
   # === STAGING FRONTEND ===
   frontend_staging:
@@ -185,8 +179,7 @@ services:
     depends_on:
       - backend_staging
     networks:
-      - homewatts-staging-net
-      - proxy
+      - homewatts-net
     labels:
       - "traefik.enable=true"
 
@@ -196,7 +189,6 @@ services:
       - "traefik.http.routers.front-staging.tls=true"
       - "traefik.http.routers.front-staging.tls.certresolver=le"
       - "traefik.http.services.front-staging.loadbalancer.server.port=80"
-      - "traefik.docker.network=pv-management-app_appnet"
 
       - "traefik.http.routers.front-staging.middlewares=sec-headers@docker"
 
@@ -206,7 +198,7 @@ services:
     container_name: homewatts-collector
     restart: unless-stopped
     depends_on:
-      db_v1: { condition: service_healthy }
+      db: { condition: service_healthy }
     environment:
       SPRING_PROFILES_ACTIVE: collector
 
@@ -233,19 +225,12 @@ services:
       retries: 6
       start_period: 15s
     networks:
-      - homewatts-prod-net
+      - homewatts-net
     # no traefik labels => not exposed publicly
 
 
 networks:
-  proxy:
-    external: true
-    name: pv-management-app_appnet
-
-  homewatts-prod-net:
-    driver: bridge
-
-  homewatts-staging-net:
+  homewatts-net:
     driver: bridge
 
 volumes:
