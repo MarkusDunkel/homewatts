@@ -162,9 +162,6 @@ services:
       - "traefik.http.routers.front-prod.tls=true"
       - "traefik.http.routers.front-prod.tls.certresolver=le"
 
-      # If the container does NOT listen on 80 internally, set explicit port:
-      # - "traefik.http.services.front-prod.loadbalancer.server.port=80"
-
       # Security headers (same as before)
       - "traefik.http.middlewares.sec-headers.headers.stsSeconds=31536000"
       - "traefik.http.middlewares.sec-headers.headers.stsIncludeSubdomains=true"
@@ -173,6 +170,9 @@ services:
       - "traefik.http.middlewares.sec-headers.headers.frameDeny=true"
       - "traefik.http.middlewares.sec-headers.headers.referrerPolicy=no-referrer"
       - "traefik.http.routers.front-prod.middlewares=sec-headers@docker"
+
+      - "traefik.http.services.front-prod.loadbalancer.server.port=80"
+      - "traefik.docker.network=pv-management-app_appnet"
 
   # === STAGING FRONTEND ===
   frontend_staging:
@@ -195,8 +195,8 @@ services:
       - "traefik.http.routers.front-staging.entrypoints=websecure"
       - "traefik.http.routers.front-staging.tls=true"
       - "traefik.http.routers.front-staging.tls.certresolver=le"
-
-      # - "traefik.http.services.front-staging.loadbalancer.server.port=80"
+      - "traefik.http.services.front-staging.loadbalancer.server.port=80"
+      - "traefik.docker.network=pv-management-app_appnet"
 
       - "traefik.http.routers.front-staging.middlewares=sec-headers@docker"
 
