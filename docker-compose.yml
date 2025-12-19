@@ -1,5 +1,3 @@
-version: "3.9"
-
 x-restart: &restart unless-stopped
 
 x-db-env: &db_env
