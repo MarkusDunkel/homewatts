@@ -32,8 +32,8 @@ jobs:
           context: ./backend
           push: true
           tags: |
-            ghcr.io/markusdunkel/homewatts-backend:staging
-            ghcr.io/markusdunkel/homewatts-backend:${{ github.sha }}
+            ghcr.io/markusdunkel/homewatts/backend:staging
+            ghcr.io/markusdunkel/homewatts/backend:${{ github.sha }}
 
       - name: Build & push frontend (staging)
         uses: docker/build-push-action@v6
@@ -41,8 +41,8 @@ jobs:
           context: ./frontend
           push: true
           tags: |
-            ghcr.io/markusdunkel/homewatts-frontend:staging
-            ghcr.io/markusdunkel/homewatts-frontend:${{ github.sha }}
+            ghcr.io/markusdunkel/homewatts/frontend:staging
+            ghcr.io/markusdunkel/homewatts/frontend:${{ github.sha }}
 
   redeploy-staging:
     runs-on: ubuntu-latest
