@@ -59,8 +59,7 @@ jobs:
             set -e
             cd ${{ secrets.STAGING_APP_DIR }}
 
-            docker compose pull backend_staging frontend_staging
-            docker compose up -d --no-deps --remove-orphans backend_staging
-            docker compose up -d --no-deps --remove-orphans frontend_staging
+            docker compose up -d --no-deps --pull always --force-recreate backend_staging
+            docker compose up -d --no-deps --pull always --force-recreate frontend_staging
 
             docker image prune -f
