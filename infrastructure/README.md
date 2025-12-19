@@ -192,7 +192,7 @@ From the root of your project (where your `Dockerfile` is located). Select as TA
 ```bash
 TAG=prod
 
-docker build --no-cache -t ghcr.io/markusdunkel/homewatts-backend:${TAG} .
+docker build --no-cache -t ghcr.io/markusdunkel/homewatts/backend:${TAG} .
 ```
 
 📝 **Tip:** You can change `latest` to a version tag (like `v1.0.0`) for better version tracking later.
@@ -208,7 +208,7 @@ echo "$GHCR_PAT" | docker login ghcr.io -u MarkusDunkel --password-stdin
 then
 
 ```bash
-docker push ghcr.io/markusdunkel/homewatts-backend:${TAG}
+docker push ghcr.io/markusdunkel/homewatts/backend:${TAG}
 ```
 
 You should see output like:
