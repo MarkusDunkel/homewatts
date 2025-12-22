@@ -138,3 +138,9 @@ Automated tests are still TODO. When expanding coverage, target the following fi
 - Backend: JUnit + Spring Boot tests that cover `SemSyncService` (use WireMock against the SEMS API), demo access edge cases, `RefreshTokenService` rotation, and the `/api/measurements/history` validation path.
 - Frontend: Vitest + Testing Library for the dashboard stores/hooks, `TrendChart` filtering logic, auth store refresh flow, and the demo access route handling of success/error navigation.
 - CI/CD: hook Maven + npm lint/tests into GitHub Actions, then push images to Artifact Registry only on green builds.
+
+
+
+
+
+hello

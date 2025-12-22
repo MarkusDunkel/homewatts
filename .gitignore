@@ -11,9 +11,6 @@ mnt/
 
 # Backend
 backend/target/
-backend/.mvn/
-backend/mvnw
-backend/mvnw.cmd
 backend/.idea/
 backend/.project
 backend/.classpath
@@ -25,7 +22,6 @@ frontend/node_modules/
 frontend/.vite/
 frontend/.eslintcache
 frontend/.vscode/
-frontend/package-lock.json
 
 # Logs
 *.log

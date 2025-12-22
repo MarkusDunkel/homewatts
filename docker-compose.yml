@@ -1,5 +1,3 @@
-version: "3.9"
-
 x-restart: &restart unless-stopped
 
 x-db-env: &db_env
@@ -102,7 +100,7 @@ services:
 
   backend_prod:
     <<: *backend_common
-    image: ghcr.io/markusdunkel/homewatts-backend:${IMAGE_TAG_PROD}
+    image: ghcr.io/markusdunkel/homewatts/backend:${IMAGE_TAG_PROD}
     container_name: homewatts-prod-be
     environment:
       <<: *backend_common_env
@@ -113,7 +111,7 @@ services:
 
   backend_staging:
     <<: *backend_common
-    image: ghcr.io/markusdunkel/homewatts-backend:${IMAGE_TAG_STAGING}
+    image: ghcr.io/markusdunkel/homewatts/backend:${IMAGE_TAG_STAGING}
     container_name: homewatts-staging-be
     environment:
       <<: *backend_common_env
@@ -124,7 +122,7 @@ services:
 
   frontend_prod:
     <<: *frontend_common
-    image: ghcr.io/markusdunkel/homewatts-frontend:${IMAGE_TAG_PROD}
+    image: ghcr.io/markusdunkel/homewatts/frontend:${IMAGE_TAG_PROD}
     container_name: homewatts-prod-fe
     depends_on:
       - backend_prod
@@ -143,7 +141,7 @@ services:
 
   frontend_staging:
     <<: *frontend_common
-    image: ghcr.io/markusdunkel/homewatts-frontend:${IMAGE_TAG_STAGING}
+    image: ghcr.io/markusdunkel/homewatts/frontend:${IMAGE_TAG_STAGING}
     container_name: homewatts-staging-fe
     depends_on:
       - backend_staging
@@ -161,7 +159,7 @@ services:
 
   collector:
     <<: *backend_common
-    image: ghcr.io/markusdunkel/homewatts-backend:${IMAGE_TAG_COLLECTOR:-${IMAGE_TAG_PROD}}
+    image: ghcr.io/markusdunkel/homewatts/backend:${IMAGE_TAG_COLLECTOR:-${IMAGE_TAG_PROD}}
     container_name: homewatts-collector
     environment:
       SPRING_PROFILES_ACTIVE: collector
