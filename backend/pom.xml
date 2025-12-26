@@ -18,8 +18,9 @@
     <description>Spring Boot backend for the PV Management dashboard</description>
     <properties>
         <java.version>17</java.version>
-        <!-- WireMock 2.x still expects Jetty 9 logging classes -->
         <wiremock.jetty.version>9.4.53.v20231009</wiremock.jetty.version>
+        <jacoco.version>0.8.10</jacoco.version>
+        <sonar.organization>markusdunkel</sonar.organization>
     </properties>
 
     <dependencies>
@@ -111,7 +112,7 @@
             <optional>true</optional>
         </dependency>
 
-         <dependency>
+        <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <scope>test</scope>
@@ -144,6 +145,7 @@
                     </excludes>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -151,6 +153,32 @@
                     <release>${java.version}</release>
                 </configuration>
             </plugin>
+
+            <!-- ✅ JaCoCo: measure test coverage, but do NOT fail the build -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco.version}</version>
+                <executions>
+                    <!-- Attach JaCoCo agent to tests -->
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+
+                    <!-- Generate HTML + XML report after running tests -->
+                    <execution>
+                        <id>report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
     </build>
 </project>
