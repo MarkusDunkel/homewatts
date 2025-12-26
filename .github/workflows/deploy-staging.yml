@@ -30,10 +30,6 @@ jobs:
           java-version: "17"
           cache: maven
 
-      - name: Run backend tests (incl. JaCoCo report)
-        working-directory: ./backend
-        run: mvn -B clean test
-
       - name: Cache SonarCloud packages
         uses: actions/cache@v4
         with:
@@ -41,18 +37,16 @@ jobs:
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
 
-      - name: SonarCloud scan
-        uses: SonarSource/sonarqube-scan-action@v7
+      - name: Run backend tests + SonarCloud (Maven)
+        working-directory: ./backend
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          projectBaseDir: backend
-          args: >
-            -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY }}
-            -Dsonar.organization=${{ vars.SONAR_ORGANIZATION }}
-            -Dsonar.host.url=https://sonarcloud.io
-            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+        run: >
+          mvn -B clean verify sonar:sonar
+          -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY }}
+          -Dsonar.organization=${{ vars.SONAR_ORGANIZATION }}
+          -Dsonar.host.url=https://sonarcloud.io
+          -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
 
   build-and-push:
     runs-on: ubuntu-latest
