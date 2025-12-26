@@ -2,6 +2,23 @@
 
 A production-ready stack for monitoring photovoltaic sites that ingests live data from the GoodWe SEMS API, stores refined snapshots in PostgreSQL, exposes secured REST APIs, and serves a React dashboard with real-time, historical, and demo access flows. The backend now includes a dedicated ingestion profile/worker, demo key lifecycle management, and hardened authentication with rotating refresh tokens.
 
+![Build](https://github.com/MarkusDunkel/homewatts/actions/workflows/deploy-staging.yml/badge.svg)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=MarkusDunkel_homewatts&metric=alert_status)](https://sonarcloud.io/dashboard?id=MarkusDunkel_homewatts)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=MarkusDunkel_homewatts&metric=coverage)](https://sonarcloud.io/dashboard?id=MarkusDunkel_homewatts)
+
+## Quality & CI
+
+This project uses a **modern CI pipeline with automated testing and quality checks**, closely aligned with real-world team workflows.
+
+- All tests are executed automatically on every pull request
+- Test coverage is measured using **JaCoCo**
+- Code quality and coverage are analyzed with **SonarCloud**
+- The `develop` branch is continuously analyzed for overall project quality
+- Pull requests are evaluated for **coverage and issues on new code** to prevent regressions
+
+➡️ **Live quality dashboard:**  
+https://sonarcloud.io/dashboard?id=MarkusDunkel_homewatts
+
 ## Project Layout
 ```
 ├── backend/                          # Spring Boot service + collector profile + Dockerfile
@@ -141,6 +158,3 @@ Automated tests are still TODO. When expanding coverage, target the following fi
 
 
 
-
-
-hello
