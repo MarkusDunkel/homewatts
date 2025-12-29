@@ -1,6 +1,7 @@
 # PV Management Platform
 
 A production-ready stack for monitoring photovoltaic sites that ingests live data from the GoodWe SEMS API, stores refined snapshots in PostgreSQL, exposes secured REST APIs, and serves a React dashboard with real-time, historical, and demo access flows. The backend now includes a dedicated ingestion profile/worker, demo key lifecycle management, and hardened authentication with rotating refresh tokens.
+<img width="817" height="1002" alt="image" src="https://github.com/user-attachments/assets/d51f99d1-05c1-4d13-986f-4916fb76fe3d" />
 
 ## Project Layout
 ```
