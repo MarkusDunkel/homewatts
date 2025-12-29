@@ -1,23 +1,33 @@
 # HomeWatts — PV Analytics Platform
 
-A portfolio project that demonstrates end-to-end engineering: data ingestion, secure APIs, a modern SPA, and production-grade DevOps. HomeWatts analyzes photovoltaic (PV) system data, normalizes it into a PostgreSQL model, and serves real-time + historical insights in a React dashboard. The project is built to showcase architecture decisions, security hardening, and automated delivery.
+HomeWatts is a web-based analytics platform for residential photovoltaic (PV) systems.  
+It ingests production and consumption data from external PV APIs, normalizes it into a relational data model, and exposes real-time and historical insights through a modern web dashboard.
+
+In addition, HomeWatts includes an optimization tool that estimates the ideal PV system size to maximize long-term energy savings based on local economic conditions and climate factors.
+
+The system is designed as a production-ready application with clear service boundaries, secure APIs, automated deployments, and a responsive single-page frontend.
 
 ![Build](https://github.com/MarkusDunkel/homewatts/actions/workflows/deploy-staging.yml/badge.svg)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=MarkusDunkel_homewatts&metric=alert_status)](https://sonarcloud.io/dashboard?id=MarkusDunkel_homewatts)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=MarkusDunkel_homewatts&metric=coverage)](https://sonarcloud.io/dashboard?id=MarkusDunkel_homewatts)
 
-## Why this project exists
-- **Webanwendung zur Analyse von Heim-Photovoltaik-Daten** (PV-Daten in Echtzeit + Historie)
-- **Architektur und Implementierung mit Spring Boot (Backend) und React (Frontend)**
-- **Sicherer Demo-Zugriff**: signierte Tokens, Rate-Limiting, Audit-Logging
-- **CI-Pipeline** mit automatisierten Tests, JaCoCo-Coverage & SonarCloud-Quality-Gates
-- **Gestufte Deployments** mit versionierten Docker-Images via GitHub Actions
+## Project Purpose
 
-## What I’m showcasing
-- **System design**: decoupled API + worker services with clear boundaries and scaling paths.
-- **Security-first API design**: JWT-based sessions, refresh-token rotation, demo access controls.
-- **Operational excellence**: containerized services, infrastructure automation, and observability hooks.
-- **Frontend craft**: polished UX, typed APIs, reusable UI primitives, and data visualization.
+The goal of HomeWatts is to provide a reliable and extensible foundation for analyzing residential PV system data, including:
+
+- Collection of PV generation and consumption metrics from external provider APIs
+- Secure access to normalized, queryable data through a REST API
+- Visualization of live and historical data in a browser-based dashboard
+- Estimation of optimal PV system sizing based on economic and climate parameters
+- Clear separation of ingestion, API, and frontend concerns for operational clarity
+
+The project reflects real-world constraints such as authentication, rate limiting, data consistency, and environment-specific deployments.
+
+## Scope & Capabilities
+
+- **Data ingestion** via a dedicated worker service with scheduled jobs  
+- **Analytics and visualization** through a React + TypeScript single-page application  
+- **Operational setup** with containerized services, TLS termination, and CI/CD
 
 ## Infrastructure & Architecture
 ```mermaid
