@@ -11,6 +11,8 @@ The system is designed as a production-ready application with clear service boun
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=MarkusDunkel_homewatts&metric=alert_status)](https://sonarcloud.io/dashboard?id=MarkusDunkel_homewatts)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=MarkusDunkel_homewatts&metric=coverage)](https://sonarcloud.io/dashboard?id=MarkusDunkel_homewatts)
 
+For information visit [homewatts.xyz](https://homewatts.xyz).
+
 ## Project Purpose
 
 The goal of HomeWatts is to provide a reliable and extensible foundation for analyzing residential PV system data, including:
@@ -148,4 +150,6 @@ Manual dev workflow:
 ```
 
 ## Contact
-If you’re looking for a developer who can design, build, and ship full-stack systems with production rigor, feel free to reach out.
+Interested in the architecture or implementation of HomeWatts?
+Questions, feedback, constructive criticism, and requests for demo access are welcome. Feel free to reach out to discuss the project or related full-stack development work.
+
