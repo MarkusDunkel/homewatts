@@ -31,15 +31,9 @@ The project reflects real-world constraints such as authentication, rate limitin
 
 ## Infrastructure & Architecture
 ```mermaid
-%%{init: { "theme": "base",
-  "flowchart": { "curve": "basis", "htmlLabels": true },
-  "themeVariables": {
-    "primaryColor": "transparent",
-    "lineColor": "hsl(var(--background))",
-    "fontSize": "14px",
-    "fontFamily": "Inter, sans-serif",
-    "textColor": "hsl(var(--foreground))"
-    }}}%%
+%%{init: { 
+  "flowchart": { "curve": "basis", "htmlLabels": true }
+}}%%
 graph TD
 
   B["<div style='text-align:center;font-size:17px;color:hsl(var(--foreground))'><b>Browser</b></div>"]
@@ -47,11 +41,10 @@ graph TD
   RP["<div style='text-align:center;font-size:17px;color:hsl(var(--foreground));margin-bottom:5px'><b>Reverse Proxy</b></div>
   <div style='text-align:left;color:hsl(var(--foreground))'>Traefik<br/>TLS termination<br/>Routing</div>"]
 
-  subgraph PR["<div style='padding-left:140px;color:hsl(var(--foreground));font-weight:700;white-space:nowrap'>PROD, STAGING</div>"]
+  subgraph PR["&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PROD, STAGING"]
 
-  FE["<div style='text-align:center;font-size:17px;color:hsl(var(--foreground));margin-bottom:5px'><b>Frontend</b></div>
-  <div style='text-align:left;color:hsl(var(--foreground))'>React · TypeScript · Tailwind<br/>nginx serves static SPA<br/>nginx proxies <code>/api/**</code> →<br/>
-  <code>backend:8080</code></div>"]
+  FE["<div style='text-align:center;font-size:17px;color:hsl(var(--foreground));margin-bottom:-42px'><b>Frontend</b></div>
+  <div style='text-align:left;color:hsl(var(--foreground))'>React · TypeScript · Tailwind<br/>nginx serves static SPA<br/>nginx proxies /api/** →<br/>backend:8080</div>"]
 
   BE["<div style='text-align:center;font-size:17px;color:hsl(var(--foreground));margin-bottom:5px'><b>Backend</b></div>
   <div style='text-align:left;color:hsl(var(--foreground))'>Spring Boot API<br/>Spring Security · JPA · JWT</div>"]
@@ -84,11 +77,18 @@ graph TD
   class DBC db
   class DB db
 
-  style PR fill:transparent,stroke:#888,stroke-width:3px,stroke-dasharray:6 4
+  style PR fill:transparent,stroke:#888,stroke-width:3px,stroke-dasharray:6 4,color:#888
 
   %% --- STYLING ALL ARROWS ---
   linkStyle default stroke-width:2px,fill:none
 ```
+A reverse proxy (Traefik) handles TLS termination and routing. The browser accesses a React/TypeScript SPA via HTTPS, which is delivered as a static application by nginx. API requests (/api/**) are forwarded from the frontend to a Spring Boot backend API, which encapsulates authentication (JWT), business logic, and persistence via JPA on a PostgreSQL database.
+
+Both the production and staging data storage as well as the database shown as a cache are technically based on the same PostgreSQL database instance, which is operated within a single Docker container. These are not separate databases, but rather one shared database that is used differently on a logical level.
+
+The visual separation in the diagram serves exclusively as a matter of emphasis: the data for PROD and STAGING is treated and managed as distinct functional environments, while the caching usage is independent of them. A separate Spring Boot worker executes scheduled jobs, calls the external SEMS API, and writes the results into this shared database.
+
+This architectural decision pursues two goals: first, the SEMS API only allows retrieval of the current values. Since the worker runs as an independent service, no data gaps occur when the rest of the application is updated or restarted. Second, the SEMS API is unstable under a high number of concurrent requests. By centrally collecting and bundling requests, all environments are supplied efficiently while reducing load on the external interface.
 
 ## Key Features (selected)
 ### Secure demo access
