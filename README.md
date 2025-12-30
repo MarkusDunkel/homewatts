@@ -35,10 +35,10 @@ The project reflects real-world constraints such as authentication, rate limitin
   "flowchart": { "curve": "basis", "htmlLabels": true },
   "themeVariables": {
     "primaryColor": "transparent",
-    "lineColor": "hsl(var(--background))",
-    "fontSize": "14px",
-    "fontFamily": "Inter, sans-serif",
-    "textColor": "hsl(var(--foreground))"
+    "lineColor": "#888",
+    "fontSize": "13px",
+    "textColor": "#888",
+    "clusterTextColor": "#888"
     }}}%%
 graph TD
 
@@ -47,7 +47,7 @@ graph TD
   RP["<div style='text-align:center;font-size:17px;color:hsl(var(--foreground));margin-bottom:5px'><b>Reverse Proxy</b></div>
   <div style='text-align:left;color:hsl(var(--foreground))'>Traefik<br/>TLS termination<br/>Routing</div>"]
 
-  subgraph PR["<div style='padding-left:140px;color:hsl(var(--foreground));font-weight:700;white-space:nowrap'>PROD, STAGING</div>"]
+  subgraph PR["<div style='padding-left:140px;padding-left:0px;color:#888;font-weight:700'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PROD, STAGING</div>"]
 
   FE["<div style='text-align:center;font-size:17px;color:hsl(var(--foreground));margin-bottom:5px'><b>Frontend</b></div>
   <div style='text-align:left;color:hsl(var(--foreground))'>React · TypeScript · Tailwind<br/>nginx serves static SPA<br/>nginx proxies <code>/api/**</code> →<br/>
@@ -84,7 +84,7 @@ graph TD
   class DBC db
   class DB db
 
-  style PR fill:transparent,stroke:#888,stroke-width:3px,stroke-dasharray:6 4
+  style PR fill:transparent,stroke:#888,stroke-width:3px,stroke-dasharray:6 4,color:#888
 
   %% --- STYLING ALL ARROWS ---
   linkStyle default stroke-width:2px,fill:none
