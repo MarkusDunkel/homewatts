@@ -82,6 +82,13 @@ graph TD
   %% --- STYLING ALL ARROWS ---
   linkStyle default stroke-width:2px,fill:none
 ```
+A reverse proxy (Traefik) handles TLS termination and routing. The browser accesses a React/TypeScript SPA via HTTPS, which is delivered as a static application by nginx. API requests (/api/**) are forwarded from the frontend to a Spring Boot backend API, which encapsulates authentication (JWT), business logic, and persistence via JPA on a PostgreSQL database.
+
+Both the production and staging data storage as well as the database shown as a cache are technically based on the same PostgreSQL database instance, which is operated within a single Docker container. These are not separate databases, but rather one shared database that is used differently on a logical level.
+
+The visual separation in the diagram serves exclusively as a matter of emphasis: the data for PROD and STAGING is treated and managed as distinct functional environments, while the caching usage is independent of them. A separate Spring Boot worker executes scheduled jobs, calls the external SEMS API, and writes the results into this shared database.
+
+This architectural decision pursues two goals: first, the SEMS API only allows retrieval of the current values. Since the worker runs as an independent service, no data gaps occur when the rest of the application is updated or restarted. Second, the SEMS API is unstable under a high number of concurrent requests. By centrally collecting and bundling requests, all environments are supplied efficiently while reducing load on the external interface.
 
 ## Key Features (selected)
 ### Secure demo access
