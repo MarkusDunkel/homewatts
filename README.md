@@ -31,15 +31,9 @@ The project reflects real-world constraints such as authentication, rate limitin
 
 ## Infrastructure & Architecture
 ```mermaid
-%%{init: { "theme": "base",
-  "flowchart": { "curve": "basis", "htmlLabels": true },
-  "themeVariables": {
-    "primaryColor": "transparent",
-    "lineColor": "#888",
-    "fontSize": "13px",
-    "textColor": "#888",
-    "clusterTextColor": "#888"
-    }}}%%
+%%{init: { 
+  "flowchart": { "curve": "basis", "htmlLabels": true }
+}}%%
 graph TD
 
   B["<div style='text-align:center;font-size:17px;color:hsl(var(--foreground))'><b>Browser</b></div>"]
@@ -47,7 +41,7 @@ graph TD
   RP["<div style='text-align:center;font-size:17px;color:hsl(var(--foreground));margin-bottom:5px'><b>Reverse Proxy</b></div>
   <div style='text-align:left;color:hsl(var(--foreground))'>Traefik<br/>TLS termination<br/>Routing</div>"]
 
-  subgraph PR["<div style='padding-left:140px;padding-left:0px;color:#888;font-weight:700'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PROD, STAGING</div>"]
+  subgraph PR["&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PROD, STAGING"]
 
   FE["<div style='text-align:center;font-size:17px;color:hsl(var(--foreground));margin-bottom:5px'><b>Frontend</b></div>
   <div style='text-align:left;color:hsl(var(--foreground))'>React · TypeScript · Tailwind<br/>nginx serves static SPA<br/>nginx proxies <code>/api/**</code> →<br/>
